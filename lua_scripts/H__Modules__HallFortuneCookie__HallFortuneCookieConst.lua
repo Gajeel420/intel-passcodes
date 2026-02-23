@@ -1,0 +1,5 @@
+HallFortuneCookieConst = {}
+
+HallFortuneCookieConst.EventName_RefreshFortuneCookieState = "EventName_RefreshFortuneCookieState"
+HallFortuneCookieConst.EventName_RefreshFortuneCookieState2 = "EventName_RefreshFortuneCookieState2"
+HallFortuneCookieConst.EventName_RefreshFortuneCookieTime = "EventName_RefreshFortuneCookieTime"

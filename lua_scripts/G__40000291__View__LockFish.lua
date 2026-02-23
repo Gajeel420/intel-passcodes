@@ -1,0 +1,94 @@
+LockFish=BaseClass()
+function LockFish:__init( )
+	-- self._tag="paotai"
+	-- self.transform=nil
+	-- self.gameObject=nil
+end
+
+-- function LockFish:Build( vo )
+-- 	self.vo = vo;
+--     self._subFishList = {}
+--     local instance =GameController:GetInstance().view:GetFishPrefabByPool(self.vo.fishKind);
+--     if not instance then return false end
+--     local t=GameController:GetInstance().view.m_poolFish:Spawn(instance).transform
+--     t.gameObject:SetActive(true)
+--     self:OnLoadObject(t)
+--     return true
+-- end
+-- function LockFish:OnLoadObject(t)
+-- 	self.gameObject=t.gameObject
+-- 	self.transform=t
+-- 	self.gameObject.tag=self._tag
+-- 	self.localPosition=self.transform.localPosition
+-- 	self.position=self.transform.position
+-- 	self:Find(o)
+-- end
+-- function LockFish:Find(o)
+-- 	-- local t = self.transform:Find("Fish_Ani/Fish");
+-- 	-- if t then
+-- 	-- 	self._mainFishSp=t:GetComponent(typeof(UISprite))
+-- 	-- end
+-- 	-- t= self.transform:Find("Fish_Ani/shadow");
+-- 	-- if t then
+-- 	-- 	self._shadowFishSp=t:GetComponent(typeof(UISprite))
+-- 	-- end
+-- 	-- t= self.transform:Find("Fish_Ani");
+-- 	-- if t then
+-- 	-- 	t:GetComponent(typeof(UIWidget)).alpha=1
+-- 	-- end
+-- 	-- self.gameObject:GetComponent(typeof(BoxCollider)).enabled = false;
+--  --    self._subFishList={}
+--  --    self:SpwanFish(self.vo.FishKindGroup1, 0);
+--  --    self:SpwanFish(self.vo.FishKindGroup2, 1);
+--  --    self:SpwanFish(self.vo.FishKindGroup3, 2);
+--  --    self:SpwanFish(self.vo.FishKindGroup4, 3);
+--  --    self:SpwanFish(self.vo.FishKindGroup5, 4);
+--  --    self._sps = self.transform:GetComponentsInChildren(typeof(UISprite),true);
+--  --    if self._sps then
+--  --    	for i=0,self._sps.Length-1 do
+--  --    		self._sps[i].alpha = 1
+--  --    	end
+--  --    end
+-- end
+-- function LockFish:SpwanFish( kind,index )
+-- 	local instance =GameController:GetInstance().view:GetFishPrefab(kind);
+--     if instance then
+--     	local t=GameObject.Instantiate(instance)
+--     	local go = t.gameObject
+--     	local s=StringFormat("Fish{0}",index)
+--     	if index==0 then
+--     		s=StringFormat("Fish")
+--     	end
+--     	go.transform.parent=self.transform:Find(s)
+--     	go.transform.localPosition=Vector3.zero
+--     	go.transform.localEulerAngles=Vector3.zero
+--     	go.transform.localScale=Vector3.one
+--     	if self.vo.fishConfig.isGroupFish then
+--     		go.transform:Find("Fish_Ani/shadow").gameObject:SetActive(false);
+--     	end
+--     	go:GetComponent(typeof(BoxCollider)).enabled=false
+-- 		if (go.transform:Find("Fish_Ani")) then
+-- 			go.transform:Find("Fish_Ani"):GetComponent(typeof(UIWidget)).alpha=1
+-- 		end
+-- 		go:GetComponent(typeof(UIWidget)).alpha=1
+--     	table.insert(self._subFishList,go)
+--     	go:SetActive(true)
+--     end
+-- end
+-- function LockFish:SetParent( parent)
+--     self.transform.parent = parent;
+-- end
+-- function LockFish:SetScale( scale)
+--     self.transform.localScale = scale;
+-- end
+-- function LockFish:SetLocalPosition(localPos)
+-- 	self.transform.localPosition = localPos;
+-- end
+-- function LockFish:SetDepth( depth )
+-- 	if self._mainFishSp then self._mainFishSp.sortingOrder=depth+1 end
+-- 	if self._shadowFishSp then self._shadowFishSp.sortingOrder=depth end
+-- 	for i,v in ipairs(self._subFishList) do
+-- 		v.transform:Find("Bone/Fish"):GetComponent(typeof(SpriteRenderer)).sortingOrder = depth + 2;
+--        --v.transform:Find("Bone/shadow"):GetComponent(typeof(SpriteRenderer)).sortingOrder = depth + 1;
+-- 	end
+-- end

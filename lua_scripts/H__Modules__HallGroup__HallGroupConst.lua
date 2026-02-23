@@ -1,0 +1,4 @@
+HallGroupConst={}
+
+HallGroupConst.EventName_FriendNewMessagePrompt="EventName_FriendNewMessagePrompt"
+HallGroupConst.EventName_MailUnreadPrompt="EventName_MailUnreadPrompt"

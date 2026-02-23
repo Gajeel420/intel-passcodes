@@ -1,0 +1,4 @@
+HallWealthListConst={}
+
+HallWealthListConst.EventName_RefreshRankList="EventName_RefreshRankList"
+HallWealthListConst.EventName_OnDestroyRankModel="EventName_OnDestroyRankModel"
