@@ -1,0 +1,62 @@
+--- a/drivers/usb/gadget/function/f_hid.c
++++ b/drivers/usb/gadget/function/f_hid.c
+@@ -1,5 +1,8 @@
+ // SPDX-License-Identifier: GPL-2.0+
+ /*
++ * NetHunter: Enhanced HID gadget support for USB HID attacks
++ * Allows raw HID report injection for keyboard/mouse emulation
++ *
+  * f_hid.c -- USB HID function driver
+  */
+
+@@ -50,6 +53,7 @@
+ 	wait_queue_head_t		write_queue;
+ 	struct usb_request		*req;
+
++	bool				raw_mode;
+ 	int				minor;
+ 	struct cdev			cdev;
+ 	struct usb_function		func;
+@@ -400,6 +406,20 @@
+ 	return status;
+ }
+
++/*
++ * NetHunter: Allow direct raw report writes without buffering
++ * This enables faster HID attack injection by bypassing
++ * the normal report queue when raw_mode is enabled.
++ */
++static bool f_hidg_raw_write_enabled(struct f_hidg *hidg)
++{
++	return hidg->raw_mode;
++}
++
++/*
++ * Standard write path with NetHunter raw mode support
++ * When raw_mode is set, reports are sent immediately without queuing
++ */
+ static ssize_t f_hidg_write(struct file *file, const char __user *buffer,
+ 			    size_t count, loff_t *offp)
+ {
+@@ -420,6 +440,13 @@
+ 		return -ENOMEM;
+ 	}
+
++	/* NetHunter: Fast path for raw mode - send immediately */
++	if (f_hidg_raw_write_enabled(hidg) && hidg->req) {
++		hidg->req->zero = 0;
++		/* Fall through to normal send path but skip wait queue */
++		goto send_report;
++	}
++
+ 	spin_lock_irqsave(&hidg->write_spinlock, flags);
+
+ 	/* Check if there is a free request to use */
+@@ -440,6 +467,7 @@
+
+ 	spin_unlock_irqrestore(&hidg->write_spinlock, flags);
+
++send_report:
+ 	if (count > hidg->report_length) {
+ 		kfree(tmp_buf);
+ 		return -EINVAL;

@@ -1,0 +1,45 @@
+--- a/net/wireless/chan.c
++++ b/net/wireless/chan.c
+@@ -1,5 +1,8 @@
+ // SPDX-License-Identifier: GPL-2.0
+ /*
++ * NetHunter: Allow monitor mode on all wireless interfaces
++ * Enables passive monitoring and active injection on all channels
++ *
+  * cfg80211 - channel management
+  */
+
+@@ -850,6 +853,11 @@
+ 	struct cfg80211_registered_device *rdev = wiphy_to_rdev(wiphy);
+ 	bool ret;
+
++	/* NetHunter: Always allow monitor mode interfaces to use any channel */
++	if (wdev && wdev->iftype == NL80211_IFTYPE_MONITOR) {
++		return true;
++	}
++
+ 	trace_cfg80211_reg_can_beacon(wiphy, chandef, iftype, check_no_ir);
+
+ 	ret = cfg80211_reg_can_beacon_relax(wiphy, chandef, iftype);
+--- a/net/wireless/nl80211.c
++++ b/net/wireless/nl80211.c
+@@ -3200,6 +3200,12 @@
+ 			return -EOPNOTSUPP;
+ 	}
+
++	/* NetHunter: Allow setting monitor mode without checking interface
++	 * combination limits, enabling monitor alongside managed mode */
++	if (type == NL80211_IFTYPE_MONITOR) {
++		goto skip_ifcomb_check;
++	}
++
+ 	if (rdev->wiphy.interface_modes & BIT(type)) {
+ 		if (nl80211_check_iftype_compat(info, type))
+ 			return -EINVAL;
+@@ -3207,6 +3213,7 @@
+ 		return -EOPNOTSUPP;
+ 	}
+
++skip_ifcomb_check:
+ 	return 0;
+ }

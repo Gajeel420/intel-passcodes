@@ -1,0 +1,44 @@
+--- a/net/mac80211/tx.c
++++ b/net/mac80211/tx.c
+@@ -1,6 +1,9 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+ /*
+  * Copyright (c) 2006-2007 Jiri Benc <jbenc@suse.cz>
++ *
++ * NetHunter: mac80211 frame injection support
++ * Allows injection of raw 802.11 frames via monitor mode interfaces
+  */
+
+ #include <linux/kernel.h>
+@@ -2000,6 +2003,10 @@
+ 	if (!is_valid_ether_addr(hdr->addr2))
+ 		return false;
+
++	/* NetHunter: Allow frame injection from monitor interfaces */
++	if (info->flags & IEEE80211_TX_CTL_INJECTED)
++		return true;
++
+ 	return true;
+ }
+
+@@ -2050,6 +2057,13 @@
+ 	struct ieee80211_chanctx_conf *chanctx_conf;
+ 	int hdrlen;
+
++	/*
++	 * NetHunter: For injected frames, skip normal TX processing checks
++	 * and allow the frame through with minimal validation.
++	 */
++	if (info->flags & IEEE80211_TX_CTL_INJECTED)
++		goto injected_skip_checks;
++
+ 	/* check for expected HW/SW features */
+ 	if (unlikely(skb->len < hdrlen))
+ 		return -1;
+@@ -2060,6 +2074,7 @@
+ 	if (!chanctx_conf)
+ 		return -ENOTCONN;
+
++injected_skip_checks:
+ 	return 0;
+ }

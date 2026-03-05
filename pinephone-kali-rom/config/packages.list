@@ -1,0 +1,110 @@
+# PinePhone Kali NetHunter - Package List
+# All-in-one pentesting computer. NO phone/telephony packages.
+
+# === Core System ===
+kali-linux-core
+systemd
+dbus
+networkmanager
+wpasupplicant
+bluez
+firmware-realtek
+firmware-misc-nonfree
+sudo
+locales
+
+# === Desktop (XFCE - lightweight for A64) ===
+xfce4
+xfce4-terminal
+xfce4-power-manager
+xfce4-goodies
+lightdm
+lightdm-gtk-greeter
+onboard
+thunar
+mousepad
+file-roller
+ristretto
+
+# === Web Browser ===
+firefox-esr
+
+# === WiFi Pentesting ===
+aircrack-ng
+kismet
+wifite
+reaver
+bully
+pixiewps
+hostapd
+dnsmasq
+mdk4
+hcxdumptool
+hcxtools
+cowpatty
+fern-wifi-cracker
+
+# === Network Pentesting ===
+nmap
+wireshark-common
+tshark
+tcpdump
+ettercap-common
+bettercap
+responder
+netcat-openbsd
+socat
+proxychains4
+tor
+
+# === Password Cracking ===
+hashcat
+john
+hydra
+medusa
+crunch
+wordlists
+
+# === Exploitation ===
+metasploit-framework
+sqlmap
+exploitdb
+set
+
+# === USB Attack Tools ===
+isc-dhcp-server
+
+# === SDR Tools ===
+rtl-sdr
+gqrx-sdr
+gr-osmosdr
+
+# === Bluetooth Pentesting ===
+bluelog
+btscanner
+spooftooph
+ubertooth
+
+# === General Tools ===
+tmux
+vim
+git
+curl
+wget
+python3
+python3-pip
+python3-venv
+openssh-server
+htop
+neofetch
+tree
+unzip
+p7zip-full
+bash-completion
+man-db
+rsync
+screen
+iproute2
+iputils-ping
+dnsutils
+whois
