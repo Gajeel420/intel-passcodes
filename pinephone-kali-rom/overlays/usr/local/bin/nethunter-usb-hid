@@ -1,0 +1,92 @@
+#!/bin/bash
+# nethunter-usb-hid - Configure USB HID gadget for keyboard emulation attacks
+# Usage: nethunter-usb-hid start|stop|status
+
+set -euo pipefail
+
+GADGET_DIR="/sys/kernel/config/usb_gadget/nethunter"
+
+start_hid() {
+    if [ -d "$GADGET_DIR" ]; then
+        echo "HID gadget already configured"
+        return
+    fi
+
+    modprobe libcomposite
+
+    mkdir -p "$GADGET_DIR"
+    cd "$GADGET_DIR"
+
+    echo 0x1d6b > idVendor   # Linux Foundation
+    echo 0x0104 > idProduct  # Multifunction Composite Gadget
+    echo 0x0100 > bcdDevice
+    echo 0x0200 > bcdUSB
+
+    mkdir -p strings/0x409
+    echo "PinePhone" > strings/0x409/manufacturer
+    echo "NetHunter HID" > strings/0x409/product
+    echo "000000000001" > strings/0x409/serialnumber
+
+    # HID keyboard function
+    mkdir -p functions/hid.keyboard
+    echo 1 > functions/hid.keyboard/protocol   # keyboard
+    echo 1 > functions/hid.keyboard/subclass   # boot interface
+    echo 8 > functions/hid.keyboard/report_length
+
+    # Standard HID keyboard report descriptor
+    echo -ne '\x05\x01\x09\x06\xa1\x01\x05\x07\x19\xe0\x29\xe7\x15\x00\x25\x01\x75\x01\x95\x08\x81\x02\x95\x01\x75\x08\x81\x03\x95\x05\x75\x01\x05\x08\x19\x01\x29\x05\x91\x02\x95\x01\x75\x03\x91\x03\x95\x06\x75\x08\x15\x00\x25\x65\x05\x07\x19\x00\x29\x65\x81\x00\xc0' > functions/hid.keyboard/report_desc
+
+    mkdir -p configs/c.1/strings/0x409
+    echo "HID Keyboard" > configs/c.1/strings/0x409/configuration
+    echo 250 > configs/c.1/MaxPower
+
+    ln -s functions/hid.keyboard configs/c.1/
+
+    # Bind to UDC
+    UDC=$(ls /sys/class/udc/ | head -1)
+    if [ -n "$UDC" ]; then
+        echo "$UDC" > UDC
+        echo "HID gadget started on $UDC"
+        echo "Device: /dev/hidg0"
+    else
+        echo "ERROR: No UDC found"
+        return 1
+    fi
+}
+
+stop_hid() {
+    if [ ! -d "$GADGET_DIR" ]; then
+        echo "HID gadget not running"
+        return
+    fi
+
+    echo "" > "$GADGET_DIR/UDC" 2>/dev/null || true
+    rm -f "$GADGET_DIR/configs/c.1/hid.keyboard"
+    rmdir "$GADGET_DIR/configs/c.1/strings/0x409" 2>/dev/null || true
+    rmdir "$GADGET_DIR/configs/c.1" 2>/dev/null || true
+    rmdir "$GADGET_DIR/functions/hid.keyboard" 2>/dev/null || true
+    rmdir "$GADGET_DIR/strings/0x409" 2>/dev/null || true
+    rmdir "$GADGET_DIR" 2>/dev/null || true
+
+    echo "HID gadget stopped"
+}
+
+status_hid() {
+    if [ -d "$GADGET_DIR" ]; then
+        echo "HID gadget: ACTIVE"
+        cat "$GADGET_DIR/UDC" 2>/dev/null && true
+        [ -e /dev/hidg0 ] && echo "Device: /dev/hidg0 exists" || echo "Device: /dev/hidg0 NOT found"
+    else
+        echo "HID gadget: INACTIVE"
+    fi
+}
+
+case "${1:-status}" in
+    start)  start_hid ;;
+    stop)   stop_hid ;;
+    status) status_hid ;;
+    *)
+        echo "Usage: $0 {start|stop|status}"
+        exit 1
+        ;;
+esac
