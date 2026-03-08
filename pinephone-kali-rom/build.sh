@@ -11,6 +11,7 @@
 #   sudo ./build.sh kernel       # Build kernel with NetHunter patches
 #   sudo ./build.sh rootfs       # Build Kali arm64 rootfs
 #   sudo ./build.sh image        # Assemble flashable image
+#   sudo ./build.sh flash /dev/sdX  # Flash image to SD card
 #   sudo ./build.sh clean        # Remove build artifacts
 
 set -euo pipefail
@@ -75,6 +76,7 @@ show_usage() {
     echo "  kernel   Build Linux kernel with NetHunter patches"
     echo "  rootfs   Build Kali arm64 root filesystem"
     echo "  image    Assemble flashable SD card image"
+    echo "  flash    Flash image to SD card/eMMC via dd"
     echo "  clean    Remove all build artifacts"
     echo ""
     echo "Environment variables:"
@@ -105,6 +107,11 @@ case "$COMMAND" in
     image)
         check_root
         run_stage "05-build-image.sh"
+        ;;
+    flash)
+        check_root
+        FLASH_TARGET="${2:-}"
+        bash "$SCRIPT_DIR/scripts/06-flash-device.sh" "$FLASH_TARGET"
         ;;
     all)
         check_root
